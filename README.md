@@ -31,70 +31,62 @@ quantum-computing/
 ├── requirements.txt       # Pinned, reproducible project dependencies
 ├── .gitignore             # Standard Python and Jupyter exclusions
 ├── LICENSE                # MIT Open Source License
-├── Notebook1.ipynb        # Hands-on gate exploration, Bell states, and AerSampler execution
-└── assignment_1.ipynb     # Classical registers, multi-qubit superposition, and AerSimulator statistics
+└── Notebook1.ipynb        # Hands-on learning notebook: Gates, Statevectors, Superposition, Measurement & Aer Simulation
 ```
 
 ### Notebook Overview
 
 | File | Focus & Implemented Topics |
 | :--- | :--- |
-| [`Notebook1.ipynb`](./Notebook1.ipynb) | Multi-gate circuit exploration ($X, H, CX, CZ, Y$), statevector analysis with `qiskit.quantum_info.Statevector`, canonical Bell state preparation ($|\Phi^+\rangle$), initializing arbitrary statevectors (`[0, sqrt(0.2), 0, sqrt(0.8)]`), and introductory Qiskit Aer simulation. |
-| [`assignment_1.ipynb`](./assignment_1.ipynb) | Building circuits with quantum and classical registers (`QuantumCircuit(2,2)`), two-qubit Hadamard operations, measuring qubits to specific classical bits (`measure(1,1)`, `measure(0,0)`), and running 1,000-shot simulations on `AerSimulator` with distribution plotting. |
+| [`Notebook1.ipynb`](./Notebook1.ipynb) | Complete hands-on notebook: multi-gate circuits ($CX, X, Z, H, CZ$), statevector analysis with `qiskit.quantum_info.Statevector`, circuit initialization from statevectors, classical registers with two-qubit measurement, single-qubit superposition, and Qiskit Aer simulation with shot statistics and distribution plotting. |
 
 ---
 
 ## 3. Implemented Experiments (Ground Truth)
 
-All experiments documented below reflect working code implemented in the repository's notebooks:
+All experiments documented below reflect working code implemented in [`Notebook1.ipynb`](./Notebook1.ipynb):
 
-### Experiment A: Single & Multi-Qubit Gate Exploration
-- **File:** `Notebook1.ipynb` (Cell 5) & `assignment_1.ipynb` (Cell 5)
+### Experiment A: Multi-Gate Circuit Exploration
+- **Notebook Section:** Cell 4–5
 - **Concept:** Constructing circuits and applying sequential single-qubit and two-qubit unitary operations:
   ```python
   from qiskit import QuantumCircuit
+
   qc = QuantumCircuit(2)
-  qc.x(1)      # Flips qubit 1 to |1>
-  qc.h(0)      # Places qubit 0 into equal superposition (|0> + |1>)/sqrt(2)
-  qc.cx(0, 1)  # CNOT: flips qubit 1 if qubit 0 is |1>
-  qc.cz(0, 1)  # Controlled-Z: applies phase flip if both qubits are |1>
-  qc.y(0)      # Pauli-Y on qubit 0
+  qc.cx(0, 1)  # CNOT: control on qubit 0, target on qubit 1
+  qc.x(0)      # Pauli-X (NOT) on qubit 0
+  qc.z(0)      # Pauli-Z (phase flip) on qubit 0
+  qc.h(1)      # Hadamard gate on qubit 1
+  qc.cz(0, 1)  # Controlled-Z between qubit 0 and qubit 1
   ```
 
-### Experiment B: Statevectors & Dirac Representation
-- **File:** `Notebook1.ipynb` (Cell 6, 9) & `assignment_1.ipynb` (Cell 6)
+### Experiment B: Statevector Analysis & Superpositions
+- **Notebook Section:** Cell 6
 - **Concept:** Representing quantum states mathematically using `qiskit.quantum_info.Statevector`:
   ```python
   from qiskit import quantum_info as qi
   import numpy as np
 
-  # Two-qubit state: (|00> + |11>) / sqrt(2)
-  psi0 = qi.Statevector([1, 0, 0, 1] / np.sqrt(2))
+  # Superposition statevector: (|00> + |10>) / sqrt(2)
+  c1 = qi.Statevector([1, 0, 1, 0] / np.sqrt(2))
+  c1.draw("latex")
   ```
 
-### Experiment C: Preparing the Canonical Bell State ($|\Phi^+\rangle$)
-- **File:** `Notebook1.ipynb` (Cell 7–11)
-- **Concept:** Transforming ground state $|00\rangle$ into a maximally entangled state using a Hadamard gate followed by a CNOT gate:
+### Experiment C: Initializing Circuits from Statevectors
+- **Notebook Section:** Cell 7
+- **Concept:** Initializing a quantum circuit to a Bell statevector and applying subsequent gates:
   ```python
-  bell = QuantumCircuit(2)
-  bell.h(0)     # Creates (|0> + |1>)/sqrt(2) on qubit 0
-  bell.cx(0, 1) # Entangles qubit 0 with qubit 1 -> (|00> + |11>)/sqrt(2)
-  ```
-- **Result:** Measuring this state yields perfectly correlated outcomes: either `00` (50%) or `11` (50%). The outcomes `01` and `10` are strictly forbidden.
+  c2 = QuantumCircuit(2)
+  quantum_state = qi.Statevector([1, 0, 0, 1] / np.sqrt(2))
 
-### Experiment D: Initializing Circuits with Arbitrary Amplitudes
-- **File:** `Notebook1.ipynb` (Cell 13–14)
-- **Concept:** Initializing a quantum circuit to a non-uniform amplitude statevector:
-  $$|\psi\rangle = 0|00\rangle + \sqrt{0.2}|01\rangle + 0|10\rangle + \sqrt{0.8}|11\rangle$$
-  ```python
-  psi_custom = qi.Statevector([0, np.sqrt(0.2), 0, np.sqrt(0.8)])
-  qc.initialize(psi_custom, [0, 1])
+  c2.initialize(quantum_state, [0, 1])
+  c2.cx(0, 1)
+  c2.z(1)
   ```
-- **Theoretical Probabilities:** $P(01) = (\sqrt{0.2})^2 = 0.20$ (20%), $P(11) = (\sqrt{0.8})^2 = 0.80$ (80%).
 
-### Experiment E: Classical Registers & Projective Measurement
-- **File:** `assignment_1.ipynb` (Cell 8)
-- **Concept:** Explicitly adding classical bits to store measurement outcomes:
+### Experiment D: Classical Registers & Multi-Qubit Measurement
+- **Notebook Section:** Cell 8
+- **Concept:** Creating circuits with quantum qubits and classical bits, applying multi-qubit Hadamard operations, and storing measurement outcomes:
   ```python
   c3 = QuantumCircuit(2, 2)  # 2 quantum bits, 2 classical bits
   c3.h(0)
@@ -106,10 +98,11 @@ All experiments documented below reflect working code implemented in the reposit
   c3.measure(0, 0)  # Measure qubit 0 into classical bit 0
   ```
 
-### Experiment F: Qiskit Aer Simulation & Shot Sampling
-- **File:** `assignment_1.ipynb` (Cell 10–12) & `Notebook1.ipynb` (Cell 16–18)
-- **Concept:** Executing a quantum circuit on `AerSimulator` across multiple shots:
+### Experiment E: Single-Qubit Superposition & Qiskit Aer Simulation
+- **Notebook Section:** Cell 9–12
+- **Concept:** Creating an equal superposition state on a single qubit, measuring in the computational basis, and simulating execution over multiple shots using `AerSimulator`:
   ```python
+  from qiskit import QuantumCircuit
   from qiskit_aer import AerSimulator
   from qiskit.visualization import plot_distribution
 
@@ -120,7 +113,8 @@ All experiments documented below reflect working code implemented in the reposit
   simulator = AerSimulator()
   result = simulator.run(qc, shots=1000).result()
   counts = result.get_counts()
-  # Example output: {'0': 508, '1': 492}
+  print(counts)
+  # Example output: {'0': 49896, '1': 50104} across repeated sampling
   plot_distribution(counts)
   ```
 
@@ -198,7 +192,7 @@ Typical counts fall naturally within $500 \pm 30$ shots (e.g. 488 vs. 512). As s
    # or
    jupyter notebook
    ```
-   Open `Notebook1.ipynb` or `assignment_1.ipynb` and select the **"Python (quantum-journey)"** kernel.
+   Open `Notebook1.ipynb` and select the **"Python (quantum-journey)"** kernel.
 
 ---
 
