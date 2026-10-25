@@ -1,0 +1,14 @@
+# Quantum Computing Framework (Qiskit 1.x / 2.x)
+qiskit>=1.1.0,<3.0.0
+
+# Quantum Circuit Simulator
+qiskit-aer>=0.14.0
+
+# Visualization and Circuit Drawing
+matplotlib>=3.8.0
+pylatexenc>=2.10
+
+# Scientific Computing & Notebook Support
+numpy>=1.24.0,<3.0.0
+ipykernel>=6.29.0
+jupyterlab>=4.1.0
